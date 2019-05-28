@@ -1,5 +1,6 @@
 # 求原根
-def PRoot(mnum, b): #a是因子个数，b是要计算的指数
+def PRoot(mnum, b): #a是因子个数，b是要计算的指数。
+	#目前只能求解a是质数的情况
     count = []
     for i in range(2, mnum):
         iscoprime = mnum%i 
