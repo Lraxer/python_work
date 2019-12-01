@@ -1,6 +1,15 @@
 import math
 # 求原根
 
+def quick_mod(a:int, x:int, n:int) -> int:
+    result = 1
+    while(x!=0):
+        if(x&1==1):
+            result = (result*a)%n
+        x = x >> 1
+        a = (a*a)%n
+    return result
+
 def Isprime(mnum): #质数判断
     sqrmnum = int(math.sqrt(mnum))
     flag = True
@@ -86,7 +95,8 @@ def PRoot(mnum, q): #a是因子个数，b是要计算的指数
         if Iscoprime(mnum, i) :
             flag = True
             for j in q:
-                check = pow(i,j) % mnum
+                check = quick_mod(i, j, mnum)
+                # show process
                 print(str(i) + '^' + str(j) + ' mod ' + str(mnum) + ' = ' + str(check) + '\n')
                 if check==1:
                     flag = False
