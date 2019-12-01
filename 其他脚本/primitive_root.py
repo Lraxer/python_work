@@ -11,7 +11,7 @@ def quick_mod(a:int, x:int, n:int) -> int:
     return result
 
 def Isprime(mnum): #质数判断
-    sqrmnum = math.floor(math.sqrt(mnum))
+    sqrmnum = int(math.sqrt(mnum))
     flag = True
     if mnum%2==0 and mnum!=2:
         return not flag
