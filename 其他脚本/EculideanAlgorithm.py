@@ -1,7 +1,7 @@
 # Eculidean Algorithm
 #! a must be greater than b
 def gcd_recursive(a, b):
-	"""递归的欧几里得算法"""
+    """递归的欧几里得算法"""
     if b==0:
         return a
     else:
@@ -14,7 +14,7 @@ def gcd_nonrecursive(a,b):
 	return a
 
 def gcd_extentsion_recursive(a, b):
-	"""递归的扩展欧几里得算法"""
+    """递归的欧几里得算法"""
     if b==0:
         return (a, 1, 0)
     else:
@@ -25,7 +25,7 @@ def gcd_extentsion_recursive(a, b):
         return (r, x, y)
     
 def gcd_extentsion_nonrecursive(a, b):
-	"""非递归的扩展欧几里得算法"""
+    """非递归的扩展欧几里得算法"""
     prevx, x=1,0
     prevy, y=0,1
     while b:
