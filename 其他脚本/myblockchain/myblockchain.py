@@ -1,16 +1,21 @@
 # author: E41714059 - LiYifei
 
-import flask
-import json
 import hashlib
+import json
 from argparse import ArgumentParser
 from time import time
+from urllib.parse import urlparse
 from uuid import uuid4
+
+import flask
+import requests
+
 
 class Blockchain:
     def __init__(self):
         self.block_transaction = []
         self.chain = []
+        self.neighbor = set()
 
         # The genesis block
         self.create_block(100, '1')
@@ -66,7 +71,45 @@ class Blockchain:
         while self.check_proof(last_block["nonce"], nonce, self.Hash(last_block)) == False:
             nonce = nonce+1
         return nonce
-        
+    
+    def register_neighbor(self, url):
+        """
+        Add a neighbor. The blockchain program can do conflict check with its neighbors.
+        Format: 127.0.0.1(:5000)
+        """
+        purl = urlparse(url)
+        if purl.netloc:
+            # input: http://127.0.0.1:5000
+            # netloc: 127.0.0.1:5000
+            self.neighbor.add(purl.netloc)
+        elif purl.path:
+            # input: 127.0.0.1:5000 (without scheme)
+            # output: 127.0.0.1:5000
+            self.neighbor.add(purl.path)
+
+    def resolve_conflict(self):
+        """
+        Keep all blockchain consistent
+        """
+
+        maxlen = len(self.chain)
+        repchain = None
+        for bk in self.neighbor:
+            res = requests.get(f"http://{bk}/showchain")
+            if res.status_code==200:
+                chainlen = res.json()['length']
+                chain = res.json()["blockchain"]
+
+                if chainlen>maxlen:
+                    maxlen = chainlen
+                    repchain = chain
+            
+        if repchain:
+            self.chain = repchain
+            return True
+
+        return False
+
     
     @staticmethod
     def Hash(block):
@@ -138,6 +181,40 @@ def mine():
     }
 
     return flask.jsonify(res), 200
+
+@app.route('/neighbor/register', methods=['POST'])
+def reg_neighbor():
+    values = flask.request.get_json(force=True)
+    neighbors = values['neighbor']
+    if neighbors is None:
+        return "Invalid input", 400
+    
+    for neighbor in neighbors:
+        blockchain.register_neighbor(neighbor)
+    
+    res = {
+        'message': 'new neighbors have been added',
+        'total_neighbor': list(blockchain.neighbor),
+    }
+
+    return flask.jsonify(res), 200
+
+@app.route('/neighbor/solve', methods=['GET'])
+def solve():
+    status = blockchain.resolve_conflict()
+    if status:
+        res = {
+            'message': 'Blockchain is replaced',
+            'new_chain': blockchain.chain,
+        }
+    else:
+        res = {
+            'message': 'do not have to change',
+            'chain': blockchain.chain,
+        }
+    
+    return flask.jsonify(res), 200
+
 
 if __name__ == "__main__":
     parser = ArgumentParser()

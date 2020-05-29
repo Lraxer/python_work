@@ -2,7 +2,8 @@ import requests
 import json
 
 def showchain():
-	url = "http://localhost:5000/showchain"
+	url1 = "http://localhost:5000/showchain"
+	url2 = "http://localhost:5001/showchain"
 	return requests.get(url2)
 
 def add_transactions():
@@ -19,8 +20,27 @@ def mine():
 	url = "http://localhost:5000/mine"
 	return requests.get(url)
 
+def addnei():
+	nei1 = "http://127.0.0.1:5000"
+	nei2 = "http://127.0.0.1:5001"
+	url1 = "http://127.0.0.1:5000/neighbor/register"
+	url2 = "http://127.0.0.1:5001/neighbor/register"
+	data = {
+		"neighbor": [nei2],
+	}
+	data = json.dumps(data)
+	return requests.post(url1, data=data)
+
+def solve():
+	url1 = "http://127.0.0.1:5000/neighbor/solve"
+	url2 = "http://127.0.0.1:5001/neighbor/solve"
+	return requests.get(url2)
+
+
 if __name__ == "__main__":
 	res = showchain()
 	# res = add_transactions()
 	# res = mine()
+	# res = addnei()
+	# res = solve()
 	print(res.text)
