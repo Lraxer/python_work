@@ -14,7 +14,7 @@ def gcd_nonrecursive(a,b):
 	return a
 
 def gcd_extentsion_recursive(a, b):
-    """递归的欧几里得算法"""
+    """递归的欧几里得扩展算法"""
     if b==0:
         return (a, 1, 0)
     else:
