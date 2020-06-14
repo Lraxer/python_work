@@ -14,15 +14,16 @@
 pip install pipenv
 ```
 
-在pipenv运行环境中安装flask
+在pipenv运行环境中安装flask和requests
 
 ```python
 pipenv install flask
+pipenv install requests
 ```
 
 运行程序
 
-```python
+```powershell
 pipenv run python myblockchain.py -p 5000
 ```
 
@@ -43,7 +44,7 @@ pipenv run python myblockchain.py -p 5000
 
 - 交易发起者(start)
 - 交易接收者(end)
-- 交易量(amount)。
+- 交易量(amount)
 
 ### 区块的结构
 
@@ -81,3 +82,104 @@ pipenv run python myblockchain.py -p 5000
 5. /neighbor/solve
 
     访问该页面，进行区块链的冲突处理。做法是将最长的链作为主链，替换掉原本的链。
+
+## 运行示例及图片
+
+执行`pipenv run python myblockchain.py -p 5000`，在本地的5000端口启动区块链服务器。
+
+![](pics/TIM截图20200603174416.png)
+
+### 添加交易
+
+```python
+def add_transactions():
+	url = "http://localhost:5000/transactions/new"
+	data = {
+		"start": "123456",
+		"end": "someone",
+		"amount": 5
+	}
+	data = json.dumps(data)
+	return requests.post(url=url, data=data)
+```
+
+用上面的函数添加一笔交易。
+
+![](pics/TIM截图20200603174707.png)
+
+![](pics/TIM截图20200603174734.png)
+
+上面的图片分别是服务器收到的消息，以及客户端收到的返回信息。
+
+### 挖矿及工作量证明
+
+```python
+def mine():
+	url = "http://localhost:5000/mine"
+	return requests.get(url)
+```
+
+用上面的函数进行挖矿。
+
+![](pics/TIM截图20200603175118.png)
+
+经过验证后，服务器返回的消息。注意，挖矿奖励的交易将会在下一个被挖出的区块之中。
+
+![](pics/TIM截图20200603175453.png)
+
+再次挖矿，交易显示的就是上一笔的奖励交易。其中收方是挖矿者的uuid。
+
+### 显示当前的区块链
+
+```python
+def showchain():
+	url1 = "http://localhost:5000/showchain"
+	return requests.get(url1)
+```
+
+![](pics/TIM截图20200603175853.png)
+
+以json格式返回的区块链，包含每个区块的信息。
+
+### 添加邻居节点
+
+`pipenv run python myblockchain.py -p 5001`启动另一个区块链服务器。
+
+```python
+def addnei():
+	nei1 = "http://127.0.0.1:5000"
+	nei2 = "http://127.0.0.1:5001"
+	url1 = "http://127.0.0.1:5000/neighbor/register"
+	url2 = "http://127.0.0.1:5001/neighbor/register"
+	data = {
+		"neighbor": [nei2],
+	}
+	data = json.dumps(data)
+	return requests.post(url1, data=data)
+```
+
+上面是向5000端口运行的服务器添加5001节点的函数。通过这种方式双方分别添加对方为可信任邻居节点。
+
+![](pics/TIM截图20200603180504.png)
+
+### 解决冲突
+
+此时5000端口的服务器有两个区块，而5001端口的服务器没有区块。
+
+```python
+def solve():
+	url1 = "http://127.0.0.1:5000/neighbor/solve"
+	url2 = "http://127.0.0.1:5001/neighbor/solve"
+	return requests.get(url1)
+```
+
+解决冲突的方式为：如果有邻居节点的区块链更长，则用邻居节点的区块替换自己的区块。
+
+![](pics/TIM截图20200603180739.png)
+
+使5000端口的服务器解决冲突，返回message为do not have to change。
+
+![](pics/TIM截图20200603180857.png)
+
+使5001端口的服务器解决冲突，返回message为Blockchain is replaced，且返回更新后的区块链。
+

@@ -4,7 +4,7 @@ import json
 def showchain():
 	url1 = "http://localhost:5000/showchain"
 	url2 = "http://localhost:5001/showchain"
-	return requests.get(url2)
+	return requests.get(url1)
 
 def add_transactions():
 	url = "http://localhost:5000/transactions/new"
@@ -14,7 +14,7 @@ def add_transactions():
 		"amount": 5
 	}
 	data = json.dumps(data)
-	return requests.post(url=url, data=data)\
+	return requests.post(url=url, data=data)
 
 def mine():
 	url = "http://localhost:5000/mine"
@@ -26,10 +26,10 @@ def addnei():
 	url1 = "http://127.0.0.1:5000/neighbor/register"
 	url2 = "http://127.0.0.1:5001/neighbor/register"
 	data = {
-		"neighbor": [nei2],
+		"neighbor": [nei1],
 	}
 	data = json.dumps(data)
-	return requests.post(url1, data=data)
+	return requests.post(url2, data=data)
 
 def solve():
 	url1 = "http://127.0.0.1:5000/neighbor/solve"
@@ -38,7 +38,7 @@ def solve():
 
 
 if __name__ == "__main__":
-	res = showchain()
+	# res = showchain()
 	# res = add_transactions()
 	# res = mine()
 	# res = addnei()
